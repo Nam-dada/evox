@@ -6,11 +6,14 @@ os.environ["PYOPENGL_PLATFORM"] = "glx"
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from evox.workflows import StdWorkflow, EvalMonitor
-from evox.algorithms import PSO
+from evox.algorithms import OpenES
 from evox.problems.neuroevolution.genesis import GenesisProblem
 import time
 import torch
 import torch.nn as nn
+
+torch.set_default_device("cuda" if torch.cuda.is_available() else "cpu")
+
 from evox.utils import ParamsAndVector
 
 
@@ -21,12 +24,12 @@ class SimpleMLP(nn.Module):
 
     def forward(self, x):
         x = self.features(x)
-        return torch.argmax(x)
+        return torch.argmax(x, dim=-1)
 
 
 # Make sure that the model is on the same device, better to be on the GPU
 device = "cuda" if torch.cuda.is_available() else "cpu"
-device = "cpu"
+# device = "cpu"
 
 # Reset the random seed
 seed = 1234
@@ -39,35 +42,28 @@ model = SimpleMLP().to(device)
 adapter = ParamsAndVector(dummy_model=model)
 
 # Set the population size
-POP_SIZE = 2
+POP_SIZE = 8
 
 model_params = dict(model.named_parameters())
 pop_center = adapter.to_vector(model_params)
-lower_bound = torch.full_like(pop_center, -5)
-upper_bound = torch.full_like(pop_center, 5)
 
-algorithm = PSO(
+
+algorithm = OpenES(
     pop_size=POP_SIZE,
-    lb=lower_bound,
-    ub=upper_bound,
-    device=device,
+    center_init=pop_center,
+    learning_rate=0.1,
+    noise_stdev=0.1,
 )
 algorithm.setup()
 
-obs_norm = {
-    "clip_val": 5.0,
-    "std_min": 1e-6,
-    "std_max": 1e6,
-}
 
 # Initialize the Brax problem
 problem = GenesisProblem(
     policy=model,
     task="GraspFixedBlock",
-    max_episode_length=1000,
-    num_episodes=3,
+    max_episode_length=100,
+    num_episodes=1,
     visual=True,
-    num_envs=1,
     pop_size=POP_SIZE,
     device=device,
 )
@@ -94,7 +90,7 @@ times = []
 start_time = time.perf_counter()
 # Run the workflow
 for i in range(max_generation):
-    if i % 10 == 0:
+    if i % 1 == 0:
         print(f"Generation {i}")
     workflow.step()
     times.append(time.perf_counter() - start_time)

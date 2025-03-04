@@ -6,7 +6,7 @@ os.environ["PYOPENGL_PLATFORM"] = "glx"
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from evox.workflows import StdWorkflow, EvalMonitor
-from evox.algorithms import NSGA2
+from evox.algorithms import PSO
 from evox.problems.neuroevolution.genesis import GenesisProblem
 import time
 import torch
@@ -40,16 +40,14 @@ adapter = ParamsAndVector(dummy_model=model)
 
 # Set the population size
 POP_SIZE = 2
-OBJs = 2
 
 model_params = dict(model.named_parameters())
 pop_center = adapter.to_vector(model_params)
 lower_bound = torch.full_like(pop_center, -5)
 upper_bound = torch.full_like(pop_center, 5)
 
-algorithm = NSGA2(
+algorithm = PSO(
     pop_size=POP_SIZE,
-    n_objs=OBJs,
     lb=lower_bound,
     ub=upper_bound,
     device=device,

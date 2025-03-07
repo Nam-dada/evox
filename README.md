@@ -63,9 +63,10 @@
 
 ## Overview
 
-EvoX is a distributed GPU-accelerated evolutionary computation framework compatible with **PyTorch***.  With a user-friendly programming model, it offers a comprehensive suite of **50+ Evolutionary Algorithms (EAs)** and a wide range of **100+ Benchmark Problems/Environments**. For more details, please refer to our [Paper](https://arxiv.org/abs/2301.12457) and [Documentation](https://evox.readthedocs.io/en/latest/) / [文档](https://evox.readthedocs.io/zh/latest/).
+EvoX is a distributed GPU-accelerated evolutionary computation framework compatible with **PyTorch**.  With a user-friendly programming model, it offers a comprehensive suite of **50+ Evolutionary Algorithms (EAs)** and a wide range of **100+ Benchmark Problems/Environments**. For more details, please refer to our [Paper](https://arxiv.org/abs/2301.12457) and [Documentation](https://evox.readthedocs.io/en/latest/) / [文档](https://evox.readthedocs.io/zh/latest/).
 
-*Users of the previous **JAX-based version** can access it on the **v0.9.0 branch**.
+> [!NOTE]
+> Users of the previous **JAX-based version** can access it on the **v0.9.0 branch**.
 
 
 ## Key Features
@@ -189,7 +190,7 @@ Solve the Ackley problem using the PSO algorithm:
 
 ```python
 import torch
-from evox.algorithms.pso_variants import PSO
+from evox.algorithms import PSO
 from evox.problems.numerical import Ackley
 from evox.workflows import StdWorkflow, EvalMonitor
 

@@ -63,7 +63,9 @@
 
 EvoX 是一个分布式 GPU 加速的进化计算框架，兼容 **PyTorch**。提供易用的编程模型，包含 **50+ 进化算法 (EAs)** 和 **100+ 基准问题/环境**。详情请参阅我们的 [论文](https://arxiv.org/abs/2301.12457) 及 [文档](https://evox.readthedocs.io/zh/latest/)。
 
-*使用 **JAX 版本** 的用户可在 **v0.9.0 分支** 获取。*
+> [!NOTE]
+> 需要使用 **JAX 版本** 的用户请安装 **0.9.0**或更早版本。
+
 
 ## 主要特性
 
@@ -185,7 +187,7 @@ pip install -e .
 
 ```python
 import torch
-from evox.algorithms.pso_variants import PSO
+from evox.algorithms import PSO
 from evox.problems.numerical import Ackley
 from evox.workflows import StdWorkflow, EvalMonitor
 

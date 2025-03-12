@@ -16,11 +16,16 @@ torch.set_default_device("cuda" if torch.cuda.is_available() else "cpu")
 
 from evox.utils import ParamsAndVector
 
+OBS_SIZE = 6
+AC_SIZE = 8
+
 
 class SimpleMLP(nn.Module):
     def __init__(self):
         super(SimpleMLP, self).__init__()
-        self.features = nn.Sequential(nn.Linear(6, 4), nn.Sigmoid(), nn.Linear(4, 8))
+        self.features = nn.Sequential(
+            nn.Linear(OBS_SIZE, 4), nn.Sigmoid(), nn.Linear(4, AC_SIZE)
+        )
 
     def forward(self, x):
         x = self.features(x)

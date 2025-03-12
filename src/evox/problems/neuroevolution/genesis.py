@@ -23,6 +23,7 @@ task_to_class = {
     "GraspRandomRod": GraspRandomRodEnv,
     "WaterFranka": WaterFrankaEnv,
     "ShadowHandBase": ShadowHandBaseEnv,
+    "Hover": HoverEnv,
 }
 
 
@@ -123,7 +124,7 @@ class GenesisProblem(Problem):
             model_state, action = self.vmap_state_forward(
                 model_state, obs.view(self.pop_size, self.num_episodes, -1)
             )
-            action = action.view(self.pop_size * self.num_episodes)
+            action = action.view(self.pop_size * self.num_episodes, -1)
             obs, reward, done = self.env.step(action)
 
             done_array = torch.logical_or(

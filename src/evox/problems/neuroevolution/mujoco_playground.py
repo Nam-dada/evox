@@ -6,11 +6,12 @@ from typing import Any, Callable, Dict, List, Literal, Optional, Tuple
 
 import jax
 import jax.numpy as jnp
+import mujoco
 import torch
 import torch.nn as nn
 import torch.utils.dlpack
 from brax import envs
-from mujoco_playground import MjxEnv, State, registry, wrapper
+from mujoco_playground import MjxEnv, State, registry
 from torch._C._functorch import get_unwrapped, is_batchedtensor
 
 from evox.core import Problem, use_state
@@ -226,6 +227,7 @@ class MujocoProblem(Problem):
         rotate_key: bool = True,
         reduce_fn: Callable[[torch.Tensor, int], torch.Tensor] = torch.mean,
         device: torch.device | None = None,
+        camera: str = None,
     ):
         """Construct a Brax-based problem.
         Firstly, you need to define a policy model.
@@ -245,6 +247,7 @@ class MujocoProblem(Problem):
         :param rotate_key: Indicates whether to rotate the random key for each iteration (default is True). <br/> If True, the random key will rotate after each iteration, resulting in non-deterministic and potentially noisy fitness evaluations. This means that identical policy weights may yield different fitness values across iterations. <br/> If False, the random key remains the same for all iterations, ensuring consistent fitness evaluations.
         :param reduce_fn: The function to reduce the rewards of multiple episodes. Default to `torch.mean`.
         :param device: The device to run the computations on. Defaults to the current default device.
+        :param camera: The name of the camera used when visualizing the environment. If None, we expect the camera is the default first one in the XML file.
 
         ## Notice
         The initial key is obtained from `torch.random.get_rng_state()`.
@@ -270,11 +273,14 @@ class MujocoProblem(Problem):
         pop_size = 1 if pop_size is None else pop_size
         # Create mjx environment
         env: MjxEnv = registry.load(env_name=env_name)
-        vmap_env = wrapper.wrap_for_brax_training(
-            env,
-            num_vision_envs=pop_size,
-            episode_length=max_episode_length,
-        )
+        model = env.mj_model
+        cam_dict = {
+            i : mujoco.mj_id2name(model, mujoco.mjtObj.mjOBJ_CAMERA, i)
+            for i in range(model.ncam)
+        }
+        camera = cam_dict[0] if camera is None else camera
+
+        vmap_env = envs.wrappers.training.VmapWrapper(env)
         self.visual_env = env
         # Compile mjx environment
         self.vis_mjx_reset = jax.jit(self.visual_env.reset)
@@ -311,6 +317,7 @@ class MujocoProblem(Problem):
         self.reduce_fn = reduce_fn
         self.rotate_key = rotate_key
         self.pop_size = pop_size
+        self.camera = camera
         self.num_episodes = num_episodes
         self.max_episode_length = max_episode_length
         self.device = device
@@ -377,6 +384,7 @@ class MujocoProblem(Problem):
         seed: int | None = None,
         output_type: Literal["mp4", "gif"] = "mp4",
         output_path: str = "output_video",
+        camera: str = None,
         /,
         **kwargs,
     ) -> str:
@@ -396,6 +404,8 @@ class MujocoProblem(Problem):
         model_state = self.init_state | weights
         output_type = kwargs.pop("output_type", output_type)
         output_path = kwargs.pop("output_path", output_path)
+        if camera is None:
+            camera = self.camera
         seed = kwargs.pop("seed", seed)
 
         # mjx environment evaluation
@@ -406,10 +416,11 @@ class MujocoProblem(Problem):
         model_state, _, trajectory = self._evaluate_mjx_record(key, model_state)
         render_every = 1
         fps = 1.0 / self.visual_env.dt / render_every
+        fps = 60
         print(f"fps: {fps}")
         # trajectory = [mjx_state for mjx_state in trajectory]
         trajectory = trajectory[::render_every]
-        kwargs = {"height": 480, "width": 640, "camera": "tracking1", **kwargs}
+        kwargs = {"height": 480, "width": 640, "camera": camera, **kwargs}
         frames = self.visual_env.render(trajectory, **kwargs)
         output_path = f"{output_path}.{output_type}"
         if output_type == "mp4":

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "evox"
-version = "1.2.0"
+version = "1.2.1"
 authors = [
   { name = "Bill Huang", email = "bill.huang2001@gmail.com" },
   { name = "Boqing Xu", email = "xuboqing123@gmail.com" },
@@ -25,6 +25,7 @@ classifiers = [
 
 dependencies = [
   "torch >= 2.6.0",
+  "numpy >= 2.0.0",
 ]
 
 [project.optional-dependencies]

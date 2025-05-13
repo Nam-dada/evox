@@ -1,3 +1,11 @@
+__all__ = [
+    "Algorithm",
+    "Problem",
+    "Workflow",
+    "Monitor",
+]
+
+
 from abc import ABC
 from typing import Any, Dict
 
@@ -7,11 +15,7 @@ from evox.core.module import ModuleBase
 
 
 class Algorithm(ModuleBase, ABC):
-    """Base class for all algorithms
-
-    ## Notice
-    If a subclass have defined `trace_impl` of `step`, its corresponding `init_step` must be overwritten even though nothing special is to be included due to Python's object-oriented limitations.
-    """
+    """Base class for all algorithms"""
 
     def __init__(self):
         super().__init__()

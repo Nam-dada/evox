@@ -1,3 +1,6 @@
+__all__ = ["StdWorkflow"]
+
+
 from typing import Any
 
 import torch
@@ -33,11 +36,10 @@ class StdWorkflow(Workflow):
         solution_transform=solution_transform(),
         fitness_transform=fitness_transform(),
     )
-    monitor = workflow.get_submodule("monitor")
     workflow.init_step()
-    print(monitor.topk_fitness)
+    print(monitor.get_topk_fitness())
     workflow.step()
-    print(monitor.topk_fitness)
+    print(monitor.get_topk_fitness())
     # run rest of the steps ...
     ```
     """
@@ -58,7 +60,7 @@ class StdWorkflow(Workflow):
 
         :param algorithm: The algorithm to be used in the workflow.
         :param problem: The problem to be used in the workflow.
-        :param monitors: The monitors to be used in the workflow. Defaults to None.
+        :param monitor: The monitors to be used in the workflow. Defaults to None.
         :param opt_direction: The optimization direction, can only be "min" or "max". Defaults to "min". If "max", the fitness will be negated prior to `fitness_transform` and monitor.
         :param solution_transform: The solution transformation function. MUST be compile-compatible module/function. Defaults to None.
         :param fitness_transforms: The fitness transformation function. MUST be compile-compatible module/function. Defaults to None.
@@ -66,7 +68,15 @@ class StdWorkflow(Workflow):
         :param enable_distributed: Whether to enable distributed workflow. Defaults to False.
         :param group: The group name used in the distributed workflow. Defaults to None.
 
-        :note: The `algorithm`, `problem`, `solution_transform`, and `fitness_transform` will be IN-PLACE moved to the device specified by `device`.
+        ```{note}
+        The `algorithm`, `problem`, `solution_transform`, and `fitness_transform` will be IN-PLACE moved to the device specified by `device`.
+        ```
+
+        ```{note}
+        The `opt_direction` parameter determines the optimization direction.
+        Since EvoX algorithms are designed to minimize by default,
+        setting `opt_direction="max"` will cause the fitness values to be negated before being passed to `fitness_transform` and the monitor.
+        ```
         """
         super().__init__()
         assert opt_direction in [
@@ -105,7 +115,7 @@ class StdWorkflow(Workflow):
 
         class _SubAlgorithm(type(algorithm)):
             def __init__(self_algo):
-                super(type(algorithm), self_algo).__init__()
+                super(Algorithm, self_algo).__init__()
                 self_algo.__dict__.update(algorithm.__dict__)
 
             def evaluate(self_algo, pop: torch.Tensor) -> torch.Tensor:
@@ -143,7 +153,7 @@ class StdWorkflow(Workflow):
             with torch.random.fork_rng():
                 fitness = self.problem.evaluate(population)
 
-            # contruct a list of tensors to gather all fitness
+            # construct a list of tensors to gather all fitness
             all_fitness = torch.zeros(pop_size, *fitness.shape[1:], device=fitness.device, dtype=fitness.dtype)
             all_fitness = list(all_fitness.tensor_split(world_size, dim=0))
             # gather all fitness

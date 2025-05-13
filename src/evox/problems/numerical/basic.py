@@ -1,3 +1,22 @@
+__all__ = [
+    "ShiftAffineNumericalProblem",
+    "Ackley",
+    "Griewank",
+    "Rastrigin",
+    "Rosenbrock",
+    "Schwefel",
+    "Sphere",
+    "Ellipsoid",
+    "ackley_func",
+    "griewank_func",
+    "rastrigin_func",
+    "rosenbrock_func",
+    "schwefel_func",
+    "sphere_func",
+    "ellipsoid_func",
+]
+
+
 import torch
 
 from evox.core import Problem
@@ -156,3 +175,21 @@ class Sphere(ShiftAffineNumericalProblem):
 
     def _true_evaluate(self, x: torch.Tensor) -> torch.Tensor:
         return sphere_func(x)
+
+
+class Ellipsoid(ShiftAffineNumericalProblem):
+    """The Ellipsoid function whose minimum is x = [0, ..., 0]"""
+
+    def __init__(self, **kwargs):
+        """Initialize the Ellipsoid function with the given parameters.
+
+        :param **kwargs: The keyword arguments (`shift` and `affine`) to pass to the superclass `ShiftAffineNumericalProblem`.
+        """
+        super().__init__(**kwargs)
+
+    def _true_evaluate(self, x: torch.Tensor) -> torch.Tensor:
+        return ellipsoid_func(x)
+
+
+def ellipsoid_func(x: torch.Tensor):
+    return torch.sum(torch.arange(1, x.size(1) + 1, device=x.device) * x**2, dim=1)

@@ -46,7 +46,8 @@
 
 
 ## 🔥 News
-- [2025-03-31] Released **EvoX 1.2.0** - 🚀 EvoX v1.2.0 release is now available, featuring the new Mujoco Playground and an official tutorial! [[Details](https://evox.group/index.php?m=home&c=View&a=index&aid=157)]
+- [2025-05-13] Released **EvoX 1.2.2** - 🚀 EvoX v1.2.2 release is now available, featuring the new Mujoco Playground and an official tutorial! [[Details](https://evox.group/index.php?m=home&c=View&a=index&aid=157)]
+- [2025-05-13] Released **EvoMO 0.2.0**: A GPU-accelerated library for **Evolutionary Multiobjective Optimization**. [[Paper](https://arxiv.org/abs/2503.20286)] [[Code](https://github.com/EMI-Group/evomo)]
 - [2025-02-03] Released **EvoRL**: A GPU-accelerated framework for **Evolutionary Reinforcement Learning**, powered by **JAX** ! [[Paper](https://arxiv.org/abs/2501.15129)] [[Code](https://github.com/EMI-Group/evorl)]
 - [2025-01-30] Released **EvoGP**: A GPU-accelerated framework for **Genetic Programming**, powered by **PyTorch** & **CUDA**! [[Paper](http://arxiv.org/abs/2501.17168)] [[Code](https://github.com/EMI-Group/evogp)]
 - [2025-01-14] Released **EvoX 1.0.0** - now fully compatible with **PyTorch**, with full `torch.compile` support! Users of the previous **JAX-based version** can access it on the **v0.9.0 branch**.
@@ -194,6 +195,8 @@ from evox.algorithms import PSO
 from evox.problems.numerical import Ackley
 from evox.workflows import StdWorkflow, EvalMonitor
 
+# torch.set_default_device("cuda") # Uncomment this line if you want to use GPU by default
+
 algorithm = PSO(pop_size=100, lb=-32 * torch.ones(10), ub=32 * torch.ones(10))
 problem = Ackley()
 monitor = EvalMonitor()
@@ -222,9 +225,10 @@ Solve the DTLZ2 problem using the RVEA algorithm:
 ```python
 import torch
 from evox.algorithms import RVEA
-from evox.metrics import igd
 from evox.problems.numerical import DTLZ2
 from evox.workflows import StdWorkflow, EvalMonitor
+
+# torch.set_default_device("cuda") # Uncomment this line if you want to use GPU by default
 
 prob = DTLZ2(m=2)
 pf = prob.pf()
@@ -264,6 +268,8 @@ from evox.algorithms import PSO
 from evox.problems.neuroevolution.brax import BraxProblem
 from evox.utils import ParamsAndVector
 from evox.workflows import EvalMonitor, StdWorkflow
+
+# torch.set_default_device("cuda") # Uncomment this line if you want to use GPU by default
 
 class SimpleMLP(nn.Module):
     def __init__(self):
@@ -325,10 +331,10 @@ monitor.plot() # or monitor.plot().show() if you are using headless mode
 > For comprehensive guidance, please visit our [Documentation](https://evox.readthedocs.io/en/latest/), where you'll find detailed installation steps, tutorials, practical examples, and complete API references.
 
 ## Sister Projects
-- **EvoRL**:GPU-accelerated framework for Evolutionary Reinforcement Learning. Check out [here](https://github.com/EMI-Group/evorl).
-- **EvoGP**:GPU-accelerated framework for Genetic Programming. Check out [here](https://github.com/EMI-Group/evogp).
+- **EvoRL**: GPU-accelerated framework for Evolutionary Reinforcement Learning. Check out [here](https://github.com/EMI-Group/evorl).
+- **EvoGP**: GPU-accelerated framework for Genetic Programming. Check out [here](https://github.com/EMI-Group/evogp).
+- **EvoMO**: GPU-accelerated library for Evolutionary Multiobjective Optimization (EMO).Check out [here](https://github.com/EMI-Group/evomo).
 - **TensorNEAT**: Tensorized NeuroEvolution of Augmenting Topologies (NEAT) for GPU Acceleration. Check out [here](https://github.com/EMI-Group/tensorneat).
-- **TensorRVEA**: Tensorized Reference Vector Guided Evolutionary Algorithm (RVEA) for GPU Acceleration. Check out [here](https://github.com/EMI-Group/tensorrvea).
 - **TensorACO**: Tensorized Ant Colony Optimization (ACO) for GPU Acceleration. Check out [here](https://github.com/EMI-Group/tensoraco).
 - **EvoXBench**: A real-world benchmark platform for solving various optimization problems, such as Neural Architecture Search (NAS). It operates without the need for GPUs/PyTorch/TensorFlow and supports multiple programming environments. Check out [here](https://github.com/EMI-Group/evoxbench).
 

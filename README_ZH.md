@@ -44,7 +44,7 @@
 ---
 
 ## 🔥 新闻
-- [2025-03-18] 发布 **EvoX 1.2.0** - 🚀 EvoX v1.2.0 发布，新增 Mujoco Playground 及官方教程！ [[更新内容](https://evox.group/index.php?m=home&c=View&a=index&aid=151)]
+- [2025-05-13] 发布 **EvoX 1.2.2** - 🚀 EvoX v1.2.2 发布，新增 Mujoco Playground 及官方教程！ [[更新内容](https://evox.group/index.php?m=home&c=View&a=index&aid=151)]
 - [2025-02-03] 发布 **EvoRL**：基于 **JAX** 的 GPU 加速 **进化强化学习** 框架！[[论文](https://arxiv.org/abs/2501.15129)] [[代码](https://github.com/EMI-Group/evorl)]
 - [2025-01-30] 发布 **EvoGP**：基于 **PyTorch** & **CUDA** 的 GPU 加速 **遗传编程** 框架！[[论文](http://arxiv.org/abs/2501.17168)] [[代码](https://github.com/EMI-Group/evogp)]
 - [2025-01-14] 发布 **EvoX 1.0.0**，全面兼容 **PyTorch**，全面接入`torch.compile`！使用 **JAX 版本** 的用户可在 **v0.9.0 分支** 获取。
@@ -191,6 +191,8 @@ from evox.algorithms import PSO
 from evox.problems.numerical import Ackley
 from evox.workflows import StdWorkflow, EvalMonitor
 
+# torch.set_default_device("cuda") # 如果您希望默认使用 GPU，请取消注释此行
+
 algorithm = PSO(pop_size=100, lb=-32 * torch.ones(10), ub=32 * torch.ones(10))
 problem = Ackley()
 monitor = EvalMonitor()
@@ -222,6 +224,8 @@ from evox.algorithms import RVEA
 from evox.metrics import igd
 from evox.problems.numerical import DTLZ2
 from evox.workflows import StdWorkflow, EvalMonitor
+
+# torch.set_default_device("cuda") # 如果您希望默认使用 GPU，请取消注释此行
 
 prob = DTLZ2(m=2)
 pf = prob.pf()
@@ -261,6 +265,8 @@ from evox.algorithms import PSO
 from evox.problems.neuroevolution.brax import BraxProblem
 from evox.utils import ParamsAndVector
 from evox.workflows import EvalMonitor, StdWorkflow
+
+# torch.set_default_device("cuda") # 如果您希望默认使用 GPU，请取消注释此行
 
 class SimpleMLP(nn.Module):
     def __init__(self):

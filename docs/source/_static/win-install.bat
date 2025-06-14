@@ -83,18 +83,18 @@ REM Temp activate conda
 call %UserProfile%\miniforge3\Scripts\activate.bat %UserProfile%\miniforge3
 call mamba info
 echo [INFO] Installing EvoX packages...
-call conda env list | findstr "evox-zoo" >nul
+call conda env list | findstr "evox-env" >nul
 if %ERRORLEVEL%==0 (
-    echo Environment evox-zoo already exists. Removing...
-    call conda env remove -n evox-zoo -y
+    echo Environment evox-env already exists. Removing...
+    call conda env remove -n evox-env -y
 )
-call mamba create -n evox-zoo python=3.10 -y
-call mamba activate evox-zoo
+call mamba create -n evox-env python=3.12 -y
+call mamba activate evox-env
 pip install numpy jupyterlab nbformat
 if /i "!use_cpu!"=="Y" (
     pip install torch
 ) else (
-    pip install "torch>=2.6.0" --index-url https://download.pytorch.org/whl/cu124
+    pip install "torch>=2.7.0" --index-url https://download.pytorch.org/whl/cu124
     pip show triton > nul 2>&1
     REM Check if install_triton is Y and triton-windows is not installed
     if /i "!install_triton!"=="Y" if %errorlevel% neq 0 (
@@ -112,7 +112,7 @@ if /i "!use_cpu!"=="Y" (
             start /wait vcredist.exe /install /quiet /norestart
         )
         echo [INFO] Installing triton-windows pip package
-        pip install https://github.com/woct0rdho/triton-windows/releases/download/v3.2.0-windows.post10/triton-3.2.0-cp310-cp310-win_amd64.whl
+        pip install -U "triton-windows<3.4"
 
         echo [INFO] Check if Windows file path length limit (260) exists
         echo [INFO] Attempting to modify registry to enable long path support.
